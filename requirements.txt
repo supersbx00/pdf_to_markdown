@@ -1,0 +1,3 @@
+fastapi[standard]
+pymupdf>=2,<3
+pytest

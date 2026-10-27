@@ -1,0 +1,29 @@
+{
+  "name": "FastAPI + Claude Light",
+  "image": "python:3.11-slim",
+    "runArgs": [
+    "--name",
+    "documentos_md_tutoria"
+  ],
+  // Node.js limpio vía features oficiales
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "lts"
+    }
+  },
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "anthropic.claude-code"
+      ]
+    }
+  },
+
+  "forwardPorts": [8182],
+
+  // Instala Claude CLI y tus dependencias de Python al arrancar
+  "postCreateCommand": "npm install -g @anthropic-ai/claude-code && pip install --no-cache-dir -r requirements.txt"
+}
