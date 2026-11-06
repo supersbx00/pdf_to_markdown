@@ -2,7 +2,7 @@
 
 ## 1. El Ciclo OpenSpec
 Todo desarrollo debe seguir el ciclo riguroso de OpenSpec:
-1. **Planificar** (`/opsx:propose`, después del protocolo de preguntas de `CLAUDE.md`; el usuario debe aprobarlo antes de aplicar): Analizar el alcance, definir contratos de la API y decidir qué componentes del Feature Layer Cascade se verán afectados.
+1. **Planificar** (`/opsx:propose`, después del protocolo de preguntas de `CLAUDE.md` y del prompt aprobado en `docs/prompts/`, ver `context.md`; el usuario debe aprobarlo antes de aplicar): Analizar el alcance, definir contratos de la API y decidir qué componentes del Feature Layer Cascade se verán afectados.
 2. **Aplicar**: Implementar los cambios escribiendo el código de las capas correspondientes.
 3. **Hacer los Changes**: Ejecutar la validación, pruebas y confirmar que la integración sea correcta.
    - **Tope de intentos:** si una prueba del feature sigue fallando tras **3 intentos** de corrección, detente y reporta al usuario qué falla y qué se intentó.

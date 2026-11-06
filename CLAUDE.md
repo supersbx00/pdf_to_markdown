@@ -9,10 +9,11 @@ Cuando el usuario solicite un nuevo feature o módulo:
 2. Saluda y reconoce el nombre del feature propuesto.
 3. Haz las preguntas **de a una por mensaje**: espera la respuesta y usa lo que aprendiste para formular la siguiente, de modo que cada pregunta aclare el requerimiento (ej: qué capas se necesitan, si requiere caché, qué dependencias externas tiene). No preguntes lo que el usuario ya respondió. Una de las preguntas debe ser el **tipo y nombre de la rama** (ver `.claude/rules/git.md`), salvo que el usuario ya lo haya indicado.
 4. Límites: **mínimo 3 preguntas, máximo 10**. Después de la tercera, detente en cuanto el requerimiento esté claro; al llegar a la décima, detente aunque quede algo abierto y márcalo como supuesto en el plan.
-5. Con las respuestas, genera el plan con OpenSpec (`/opsx:propose`). Ese proposal **es** el plan: no se presenta otro aparte.
-6. Espera que el usuario apruebe el proposal. Recién ahí se codifica (`/opsx:apply`).
+5. Con las respuestas, escribe el prompt en `docs/prompts/<tarea>.md` y espera su aprobación (ver `.claude/rules/context.md`).
+6. Con el prompt aprobado, genera el plan con OpenSpec (`/opsx:propose`). Ese proposal **es** el plan: no se presenta otro aparte.
+7. Espera que el usuario apruebe el proposal. Recién ahí se codifica (`/opsx:apply`).
 
-**Flujo completo:** preguntas → proposal de OpenSpec → aprobación del usuario → código.
+**Flujo completo:** preguntas → prompt en `docs/prompts/` → aprobación → proposal de OpenSpec → aprobación → código.
 
 ## 2. Roles del Asistente
 Dependiendo de la fase del desarrollo, debes asumir uno de los siguientes roles:
@@ -23,12 +24,13 @@ Dependiendo de la fase del desarrollo, debes asumir uno de los siguientes roles:
 - **Agente Tester**: Genera pruebas unitarias e integración comprobando casos de éxito, fallos y degradación de servicios (usando mocks para I/O).
 
 ### 2.1 Agente Builder: fase de planificación
-1. **Consulta inicial:** antes de proponer una solución, revisa el estado del proyecto y el contexto disponible: Obsidian si hay conexión; si no, `docs/memory/` si existe. Si una fuente no existe, se omite y se sigue: no se crea ni se busca más.
+1. **Consulta inicial:** antes de proponer una solución, revisa el estado del proyecto y el contexto disponible: Obsidian si hay conexión; si no, `docs/memory/` si existe. Si una fuente no existe, se omite y se sigue: no se crea ni se busca más. Lee de forma acotada, según `.claude/rules/context.md`.
 2. **Preguntas:** sigue el protocolo de la sección 1 (de a una, mínimo 3, máximo 10).
-3. **Plan:** redacta el plan con OpenSpec (`/opsx:propose`).
-4. **Sin código de implementación:** durante la planificación está prohibido escribir código del proyecto (`.py` de `src/`, tests, configuración). El único entregable es el plan OpenSpec.
-5. **Auditoría del plan:** antes de mostrarlo, el plan pasa por el Agente Auditor (máximo 2 rondas; luego se muestra con las objeciones abiertas).
-6. **Transición a código:** solo cuando el usuario aprueba explícitamente el plan se levanta la restricción y se codifica con `/opsx:apply` siguiendo Ponytail.
+3. **Prompt:** escribe `docs/prompts/<tarea>.md` y espera su aprobación (`.claude/rules/context.md`).
+4. **Plan:** con el prompt aprobado, redacta el plan con OpenSpec (`/opsx:propose`).
+5. **Sin código de implementación:** durante la planificación está prohibido escribir código del proyecto (`.py` de `src/`, tests, configuración). Los únicos entregables son el prompt y el plan OpenSpec.
+6. **Auditoría del plan:** antes de mostrarlo, el plan pasa por el Agente Auditor (máximo 2 rondas; luego se muestra con las objeciones abiertas).
+7. **Transición a código:** solo cuando el usuario aprueba explícitamente el plan se levanta la restricción y se codifica con `/opsx:apply` siguiendo Ponytail.
 
 ### 2.2 Agente Auditor: checklist de rechazo
 Se rechaza (y se devuelve al Builder) si encuentra cualquiera de estos puntos:
@@ -36,7 +38,7 @@ Se rechaza (y se devuelve al Builder) si encuentra cualquiera de estos puntos:
 2. **Violación de la arquitectura:** archivos fuera de `src/api/<feature>/`, nombres que no siguen `<feature>_<capa>.py`, o capas que invaden a otras (ej. Service con Redis o SQL, Mapper con I/O o `HTTPException`, Controller que pisa un `HTTPException` del Service). Ver `.claude/rules/architecture.md`.
 3. **Violación de los estándares:** queries globales, utilidades duplicadas que ya existen en `src/shared/`, clientes o pools creados dentro del feature en vez de usar `src/config/`, o caché sin timeout ni degradación. Ver `.claude/rules/coding_standards.md`.
 
-Solo rechaza por estos criterios; lo demás lo anota como sugerencia sin bloquear. Respeta el límite de rondas de la sección 2.
+Solo rechaza por estos criterios; lo demás (incluido SOLID, `.claude/rules/solid.md`) lo anota como sugerencia sin bloquear. Respeta el límite de rondas de la sección 2.
 
 **Prioridad ante conflicto:** la arquitectura (`.claude/rules/architecture.md`) decide qué capas existen; Ponytail decide cuánto código va dentro de cada capa. Ponytail nunca elimina una capa que la arquitectura exige.
 

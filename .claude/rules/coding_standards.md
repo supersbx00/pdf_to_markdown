@@ -2,6 +2,7 @@
 
 ## 1. Calidad y Estilo
 - **Ponytail**: el código dentro de cada capa sigue la skill `/ponytail` (mínimo código que funciona, stdlib antes que dependencias, sin abstracciones especulativas). Ponytail no decide qué capas existen: eso lo define `architecture.md`. El Agente Auditor señala los incumplimientos en una sola pasada; no rechaza ni re-itera automáticamente.
+- **SOLID**: guía para escribir y revisar cada capa, adaptada a FastAPI en `solid.md`. Nunca justifica agregar clases, interfaces o capas que el feature no necesita.
 
 ## 2. Definición de Queries (SQL/GraphQL)
 - Toda query debe definirse como un **string local dentro de la función** que la utiliza. 
