@@ -1,3 +1,4 @@
+import base64
 import io
 import os
 import zipfile
@@ -204,3 +205,36 @@ def test_descargar_comandos_en_fuente_normal_en_bloque():
     markdown = _markdown_descargado(_pdf_con_indice_y_codigo())
     assert "```\npip install fastapi\nfastapi dev app/main.py\n```" in markdown
     assert "Fin del capitulo con texto normal para cerrar." in markdown
+
+
+def _convertir_base64(contenido: bytes, nombre: str = "doc.pdf"):
+    return client.post(
+        "/documentos/convertir-base64",
+        json={"nombre": nombre, "contenido_base64": base64.b64encode(contenido).decode()},
+    )
+
+
+def test_base64_pdf_valido():
+    r = _convertir_base64(_pdf_con_texto(), "informe.pdf")
+    assert r.status_code == 200
+    body = r.json()
+    assert body["archivo"] == "informe.pdf"
+    assert body["paginas"] == 2
+    assert "Segunda pagina del documento." in body["markdown"]
+
+
+def test_base64_invalido_es_rechazado():
+    r = client.post("/documentos/convertir-base64", json={"nombre": "x.pdf", "contenido_base64": "esto no es base64!!"})
+    assert r.status_code == 400
+    assert "base64" in r.json()["detail"]
+
+
+def test_base64_de_texto_plano_es_rechazado():
+    r = _convertir_base64(b"hola, no soy un pdf", "x.pdf")
+    assert r.status_code == 400
+    assert "no es un PDF válido" in r.json()["detail"]
+
+
+def test_base64_body_incompleto_es_rechazado():
+    r = client.post("/documentos/convertir-base64", json={"nombre": "x.pdf"})
+    assert r.status_code == 422
